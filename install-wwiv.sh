@@ -14,7 +14,7 @@ networkf/networkf
 wwivutil/wwivutil
 '
 
-set -e
+set -xe
 
 cd $1
 

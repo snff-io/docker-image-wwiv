@@ -1,6 +1,6 @@
 #!/bin/sh
 
-set -e
+set -xe
 
 mkdir -p $1
 cd $1
