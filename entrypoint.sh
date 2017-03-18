@@ -1,5 +1,8 @@
 #!/bin/sh
 
+PATH=/opt/wwiv:$PATH
+export PATH
+
 if [ ! -d data ]; then
 	cp -a /opt/wwiv/admin/* .
 	cp inifiles/* .
