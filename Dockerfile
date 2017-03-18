@@ -1,4 +1,12 @@
 FROM fedora
+ARG git_branch=master
+ARG git_refspec=HEAD
+
+LABEL org.wwivbbs.git_branch=${git_branch}
+LABEL org.wwivbbs.git_refspec=${git_refspec}
+
+RUN dnf -y install dnf-plugins-core
+RUN dnf -y copr enable larsks/binkd
 RUN dnf install -y \
 	git \
 	make \
@@ -8,14 +16,16 @@ RUN dnf install -y \
 	gcc-c++ \
 	vim \
 	unzip \
+	zip \
 	findutils \
 	iproute \
 	procps-ng \
-	hostname
+	hostname \
+	binkd
 
 RUN mkdir /docker
 COPY clone-wwiv.sh /docker/clone-wwiv.sh
-RUN sh /docker/clone-wwiv.sh /src
+RUN sh /docker/clone-wwiv.sh /src ${git_branch} ${git_revision}
 
 COPY patch-wwiv.sh /docker/patch-wwiv.sh
 COPY patches /docker/patches
