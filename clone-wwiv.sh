@@ -2,6 +2,12 @@
 
 set -xe
 
-mkdir -p $1
-cd $1
-git clone https://github.com/wwivbbs/wwiv/ wwiv
+srcdir=$1
+branch=$2
+refspec=$3
+
+mkdir -p $srcdir
+cd $srcdir
+git clone -b $branch https://github.com/wwivbbs/wwiv/ wwiv
+cd wwiv
+git checkout $refspec
