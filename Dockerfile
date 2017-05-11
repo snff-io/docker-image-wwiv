@@ -29,7 +29,7 @@ RUN sh /docker/clone-wwiv.sh /src ${git_branch} ${git_revision}
 
 COPY patch-wwiv.sh /docker/patch-wwiv.sh
 COPY patches /docker/patches
-RUN sh /docker/patch-wwiv.sh /src/wwiv /docker/patches
+# RUN sh /docker/patch-wwiv.sh /src/wwiv /docker/patches
 
 COPY build-wwiv.sh /docker/build-wwiv.sh
 RUN sh /docker/build-wwiv.sh /src/wwiv
