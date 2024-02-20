@@ -8,6 +8,9 @@ refspec=$3
 
 mkdir -p $srcdir
 cd $srcdir
-git clone -b $branch https://github.com/snff-io/wwiv/ wwiv
+git clone --recurse-submodules -b $branch https://github.com/snff-io/wwiv/ wwiv
+
 cd wwiv
 git checkout $refspec
+
+

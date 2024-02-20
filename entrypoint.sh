@@ -8,6 +8,9 @@ if [ ! -d data ]; then
 	cp inifiles/* .
 fi
 
+echo "SITUATION_INTERACTIVE="$INTERACTIVE	
+
+
 while [ ! -f data/wwivd.json ]; do
 	cat <<-EOF
 	**********************************************************************
@@ -17,10 +20,10 @@ while [ ! -f data/wwivd.json ]; do
 
 	EOF
 
-	echo "Press RETURN to run init"
+	echo "Press RETURN to run wwivconfig"
 	read key
 
-	/opt/wwiv/init
+	/opt/wwiv/wwivconfig
 done
 
 chown -R wwiv:wwiv .

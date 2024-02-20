@@ -1,9 +1,9 @@
-FROM fedora
+FROM fedora AS BULID
 ARG git_branch=main
 ARG git_refspec=HEAD
 
-LABEL org.wwivbbs.git_branch=${git_branch}
-LABEL org.wwivbbs.git_refspec=${git_refspec}
+LABEL org.snffio.wwiv.git_branch=${git_branch}
+LABEL org.snffio.wwiv.git_refspec=${git_refspec}
 
 RUN dnf -y install dnf-plugins-core
 RUN dnf install -y \
@@ -19,7 +19,10 @@ RUN dnf install -y \
 	findutils \
 	iproute \
 	procps-ng \
-	hostname 
+	hostname \
+	zlib-devel 
+
+RUN mkdir /opt/wwiv
 
 RUN mkdir /docker
 COPY clone-wwiv.sh /docker/clone-wwiv.sh
@@ -33,7 +36,13 @@ COPY build-wwiv.sh /docker/build-wwiv.sh
 RUN sh /docker/build-wwiv.sh /src/wwiv
 
 COPY install-wwiv.sh /docker/install-wwiv.sh
-RUN sh /docker/install-wwiv.sh /src/wwiv /opt/wwiv
+RUN sh /docker/install-wwiv.sh /src/wwiv/_build /opt/wwiv
+
+# LABEL SITUATION_LAYERIZATION="I"
+# FROM scratch 
+# COPY --from=BULID /opt/wwiv /opt/wwiv/
+EXPOSE 2323
+EXPOSE 22
 
 COPY entrypoint.sh /docker/entrypoint.sh
 ENTRYPOINT ["sh", "/docker/entrypoint.sh"]

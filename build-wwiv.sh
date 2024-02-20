@@ -9,7 +9,15 @@ cd deps/cl345
 make
 )
 
-cmake \
+rm -rf _build
+mkdir _build
+cd _build
+
+cmake -S ../ -B ./  \
 	-DCMAKE_INSTALL_PREFIX:PATH=/opt/wwiv \
-	-DCMAKE_BUILD_TYPE:STRING=Debug
+	-DCMAKE_BUILD_TYPE:STRING=Debug 
+	
+	
 make
+
+cd ..

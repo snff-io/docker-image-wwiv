@@ -2,7 +2,6 @@
 
 BINARIES='
 bbs/bbs
-init/init
 wwivd/wwivd
 network/network
 network1/network1
@@ -12,6 +11,9 @@ networkb/networkb
 networkc/networkc
 networkf/networkf
 wwivutil/wwivutil
+wwivconfig/wwivconfig
+wwivfsed/wwivfsed
+release/*
 '
 
 set -xe
@@ -20,4 +22,3 @@ cd $1
 
 mkdir -p $2
 install -m 755 $BINARIES $2
-cp -a bbs/admin $2/admin
