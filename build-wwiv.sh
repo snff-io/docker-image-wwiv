@@ -5,7 +5,7 @@ set -xe
 cd $1
 
 (
-cd deps/cl342
+cd deps/cl345
 make
 )
 

@@ -1,5 +1,5 @@
 FROM fedora
-ARG git_branch=master
+ARG git_branch=main
 ARG git_refspec=HEAD
 
 LABEL org.wwivbbs.git_branch=${git_branch}
