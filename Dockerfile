@@ -21,7 +21,6 @@ RUN dnf install -y \
 	iproute \
 	procps-ng \
 	hostname \
-	binkd
 
 RUN mkdir /docker
 COPY clone-wwiv.sh /docker/clone-wwiv.sh
