@@ -5,40 +5,8 @@ ARG git_refspec=HEAD
 LABEL org.snffio.wwiv.git_branch=${git_branch}
 LABEL org.snffio.wwiv.git_refspec=${git_refspec}
 
-# RUN apt update
-# RUN apt install -y \
-# 	git \
-# 	make \
-# 	libncurses5-dev \
-# 	cmake \
-# 	gcc \
-# 	g++ \
-# 	vim \
-# 	unzip \
-# 	zip \
-# 	findutils \
-# 	iproute2 \
-# 	procps \
-# 	hostname \
-# 	zlib1g-dev \
-# 	build-essential
-
 RUN dnf -y install dnf-plugins-core
-RUN dnf install -y \
-	git \
-	make \
-	ncurses-devel \
-	cmake \
-	gcc \
-	gcc-c++ \
-	vim \
-	unzip \
-	zip \
-	findutils \
-	iproute \
-	procps-ng \
-	hostname \
-	zlib-devel 
+RUN dnf install -y git make ncurses-devel cmake gcc gcc-c++ vim unzip zip findutils iproute procps-ng hostname zlib-devel
 
 RUN mkdir /opt/wwiv
 
@@ -56,31 +24,25 @@ RUN sh /docker/build-wwiv.sh /src/wwiv
 WORKDIR /opt/wwiv
 COPY install-wwiv.sh /docker/install-wwiv.sh
 RUN sh /docker/install-wwiv.sh /src/wwiv/_build /opt/wwiv
-RUN [ "/opt/wwiv/wwivconfig", "--initialize" ]
+
 
 LABEL SITUATION_LAYERIZATION="distro-switchstro"
 FROM fedora  
 
 COPY --from=BULID /opt/wwiv /opt/wwiv/
 
-EXPOSE 2323
-EXPOSE 22
 
 #RUN dnf -y install dnf-plugins-core
-RUN dnf install -y \
-	zip \
-	unzip \
-	zlib-devel \ 
-	ncurses-devel 
+RUN dnf -y install dnf-plugins-core
+RUN dnf install -y git make ncurses-devel cmake gcc gcc-c++ vim unzip zip findutils iproute procps-ng hostname zlib-devel
 
-	# findutils \
-	# iproute \
-	# procps-ng \
-	# hostname \
-	# gcc \
-	# gcc-c++ \
-
+COPY entrypoint.sh /docker/entrypoint.sh
+RUN sh /docker/entrypoint.sh
 
 WORKDIR /opt/wwiv
+
+RUN [ "/opt/wwiv/wwivconfig" ]
+EXPOSE 2323
+EXPOSE 22
 RUN adduser -D -h /opt/wwiv wwiv
-CMD [ "/opt/wwiv/wwivd" ]
+CMD ["/opt/wwiv/wwivd"]

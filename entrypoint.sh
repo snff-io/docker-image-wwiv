@@ -1,5 +1,5 @@
 #!/bin/sh
-
+-xe
 PATH=/opt/wwiv:$PATH
 export PATH
 
