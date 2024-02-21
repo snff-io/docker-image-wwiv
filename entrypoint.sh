@@ -10,6 +10,7 @@ fi
 
 echo "SITUATION_INTERACTIVE="$INTERACTIVE	
 
+cd /opt/wwiv
 
 while [ ! -f data/wwivd.json ]; do
 	cat <<-EOF
@@ -23,7 +24,7 @@ while [ ! -f data/wwivd.json ]; do
 	echo "Press RETURN to run wwivconfig"
 	read key
 
-	/opt/wwiv/wwivconfig
+	wwivconfig
 done
 
 chown -R wwiv:wwiv .

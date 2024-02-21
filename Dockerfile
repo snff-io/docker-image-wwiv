@@ -5,6 +5,24 @@ ARG git_refspec=HEAD
 LABEL org.snffio.wwiv.git_branch=${git_branch}
 LABEL org.snffio.wwiv.git_refspec=${git_refspec}
 
+# RUN apt update
+# RUN apt install -y \
+# 	git \
+# 	make \
+# 	libncurses5-dev \
+# 	cmake \
+# 	gcc \
+# 	g++ \
+# 	vim \
+# 	unzip \
+# 	zip \
+# 	findutils \
+# 	iproute2 \
+# 	procps \
+# 	hostname \
+# 	zlib1g-dev \
+# 	build-essential
+
 RUN dnf -y install dnf-plugins-core
 RUN dnf install -y \
 	git \
@@ -26,7 +44,7 @@ RUN mkdir /opt/wwiv
 
 RUN mkdir /docker
 COPY clone-wwiv.sh /docker/clone-wwiv.sh
-RUN sh /docker/clone-wwiv.sh /src ${git_branch} ${git_revision}
+RUN sh /docker/clone-wwiv.sh /src ${git_branch} ${git_refspec}
 
 COPY patch-wwiv.sh /docker/patch-wwiv.sh
 COPY patches /docker/patches
@@ -35,19 +53,34 @@ COPY patches /docker/patches
 COPY build-wwiv.sh /docker/build-wwiv.sh
 RUN sh /docker/build-wwiv.sh /src/wwiv
 
+WORKDIR /opt/wwiv
 COPY install-wwiv.sh /docker/install-wwiv.sh
 RUN sh /docker/install-wwiv.sh /src/wwiv/_build /opt/wwiv
+RUN [ "/opt/wwiv/wwivconfig", "--initialize" ]
 
-# LABEL SITUATION_LAYERIZATION="I"
-# FROM scratch 
-# COPY --from=BULID /opt/wwiv /opt/wwiv/
+LABEL SITUATION_LAYERIZATION="distro-switchstro"
+FROM fedora  
+
+COPY --from=BULID /opt/wwiv /opt/wwiv/
+
 EXPOSE 2323
 EXPOSE 22
 
-COPY entrypoint.sh /docker/entrypoint.sh
-ENTRYPOINT ["sh", "/docker/entrypoint.sh"]
-WORKDIR /srv/wwiv
-VOLUME /srv/wwiv
+#RUN dnf -y install dnf-plugins-core
+RUN dnf install -y \
+	zip \
+	unzip \
+	zlib-devel \ 
+	ncurses-devel 
 
-RUN useradd -d /srv/wwiv wwiv
-CMD ["/opt/wwiv/wwivd", "--wwiv_user=wwiv"]
+	# findutils \
+	# iproute \
+	# procps-ng \
+	# hostname \
+	# gcc \
+	# gcc-c++ \
+
+
+WORKDIR /opt/wwiv
+RUN adduser -D -h /opt/wwiv wwiv
+CMD [ "/opt/wwiv/wwivd" ]
