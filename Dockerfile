@@ -27,14 +27,26 @@ RUN sh /docker/install-wwiv.sh /src/wwiv/_build /opt/wwiv
 
 
 LABEL SITUATION_LAYERIZATION="distro-switchstro"
-FROM fedora  
+FROM busybox  
+
+
+# Create directories to store libraries
+RUN mkdir -p /usr/local/lib /usr/local/include
+
+
+# Set library path
+ENV LD_LIBRARY_PATH=/usr/local/lib
+
 
 COPY --from=BULID /opt/wwiv /opt/wwiv/
 
 
+
+
+
 #RUN dnf -y install dnf-plugins-core
 RUN dnf -y install dnf-plugins-core
-RUN dnf install -y git make ncurses-devel cmake gcc gcc-c++ vim unzip zip findutils iproute procps-ng hostname zlib-devel
+RUN dnf install -y git make ncurses-devel cmake gcc gcc-c++ vim unzip zip findutils iproute procps-ng zlib-devel
 
 COPY entrypoint.sh /docker/entrypoint.sh
 RUN sh /docker/entrypoint.sh
