@@ -51,3 +51,29 @@ container using the `docker exec` command. For example, to log in to
 the BBS locally:
 
     docker exec -it -u wwiv wwiv /opt/wwiv/bbs
+
+
+## UPDATES jazam 050124
+
+Recommenedations;
+
+NOTE: The ENTRYPOINT script has changed considerably and looks for `WWIV_MODE`. If there is no `WWIV_MODE` specified and you are running interactivly, you'll get a nice menu. If you set `WWIV_MODE` to `"config"` you'll get wwivconfig, if you set it to `"wfc"`, you'll get a "working" wfc screen / local instance. `WWIV_MODE=""` or anything `else` runs wwivd.
+
+1) Make sure to create and set the `VOLUME` to `wwiv`: `docker volume create wwiv`
+
+THEN
+
+2) NEW BBS: `config.sh`: modify the ports in `config.sh` and run in to configure bbs/wwivd. Exit the config, stop and remove container. Saving config is seems finicky.
+
+THEN
+
+4) `wfc.sh`: run this for a "working" wfc screen! The "S" menu option shows a cool status screen that actually works! You can leave this running if you like.
+
+THEN
+
+5) `wwivd.sh`: this is your local test/production script. Check the ports for production interference/readiness before running.
+
+THEN
+
+3) `config.sh`: ongoing; check the ports in config (to not override your production ports) and run for an instance of wwivconfig you can leave open and see what saves dynamically. 
+
