@@ -1,0 +1,178 @@
+{
+    "version": 1,
+    "menu": {
+        "cls": false,
+        "num_action": "none",
+        "logging_action": "key",
+        "help_type": "always",
+        "generated_menu": {
+            "num_cols": 6,
+            "color_title": "|#4",
+            "color_item_key": "|#2",
+            "color_item_text": "|#0",
+            "color_item_braces": "|#7",
+            "show_empty_text": false,
+            "num_newlines_at_end": 0
+        },
+        "title": "",
+        "acs": "",
+        "password": "",
+        "enter_actions": [
+            {
+                "cmd": "amsg:read",
+                "data": "",
+                "acs": ""
+            }
+        ],
+        "exit_actions": [],
+        "items": [
+            {
+                "item_key": "",
+                "item_text": "",
+                "visible": true,
+                "help_text": "",
+                "log_text": "",
+                "instance_message": "",
+                "acs": "",
+                "password": "",
+                "actions": []
+            },
+            {
+                "item_key": "A",
+                "item_text": "Auto-reply",
+                "visible": false,
+                "help_text": "Replies via email to the AutoMessage author",
+                "log_text": "AutoReply",
+                "instance_message": "",
+                "acs": "",
+                "password": "",
+                "actions": [
+                    {
+                        "cmd": "amsg:email",
+                        "data": "",
+                        "acs": ""
+                    }
+                ]
+            },
+            {
+                "item_key": "D",
+                "item_text": "Delete",
+                "visible": true,
+                "help_text": "Delete current automessage",
+                "log_text": "",
+                "instance_message": "",
+                "acs": "user.sysop == true",
+                "password": "",
+                "actions": [
+                    {
+                        "cmd": "amsg:delete",
+                        "data": "",
+                        "acs": ""
+                    }
+                ]
+            },
+            {
+                "item_key": "R",
+                "item_text": "Read",
+                "visible": false,
+                "help_text": "Reads the current auto message",
+                "log_text": "",
+                "instance_message": "",
+                "acs": "",
+                "password": "",
+                "actions": [
+                    {
+                        "cmd": "amsg:read",
+                        "data": "",
+                        "acs": ""
+                    }
+                ]
+            },
+            {
+                "item_key": "L",
+                "item_text": "Lock",
+                "visible": true,
+                "help_text": "",
+                "log_text": "",
+                "instance_message": "",
+                "acs": "user.cosysop == true",
+                "password": "",
+                "actions": [
+                    {
+                        "cmd": "Amsg:Lock",
+                        "data": "",
+                        "acs": ""
+                    }
+                ]
+            },
+            {
+                "item_key": "U",
+                "item_text": "Unlock",
+                "visible": true,
+                "help_text": "",
+                "log_text": "",
+                "instance_message": "",
+                "acs": "user.cosysop == true",
+                "password": "",
+                "actions": [
+                    {
+                        "cmd": "Amsg:Unlock",
+                        "data": "",
+                        "acs": ""
+                    }
+                ]
+            },
+            {
+                "item_key": "W",
+                "item_text": "Write",
+                "visible": false,
+                "help_text": "",
+                "log_text": "",
+                "instance_message": "",
+                "acs": "user.sl >= 20",
+                "password": "",
+                "actions": [
+                    {
+                        "cmd": "Amsg:Write",
+                        "data": "",
+                        "acs": ""
+                    }
+                ]
+            },
+            {
+                "item_key": "Q",
+                "item_text": "Quit",
+                "visible": false,
+                "help_text": "Returns to the previous menu",
+                "log_text": "",
+                "instance_message": "",
+                "acs": "",
+                "password": "",
+                "actions": [
+                    {
+                        "cmd": "ReturnFromMenu",
+                        "data": "",
+                        "acs": ""
+                    }
+                ]
+            },
+            {
+                "item_key": "?",
+                "item_text": "Display Help",
+                "visible": false,
+                "help_text": "",
+                "log_text": "",
+                "instance_message": "",
+                "acs": "",
+                "password": "",
+                "actions": [
+                    {
+                        "cmd": "DisplayMenu",
+                        "data": "",
+                        "acs": ""
+                    }
+                ]
+            }
+        ]
+    }
+}

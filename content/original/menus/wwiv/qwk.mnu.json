@@ -1,0 +1,138 @@
+{
+    "version": 1,
+    "menu": {
+        "cls": true,
+        "num_action": "none",
+        "logging_action": "none",
+        "help_type": "always",
+        "generated_menu": {
+            "num_cols": 1,
+            "color_title": "|#4",
+            "color_item_key": "|#2",
+            "color_item_text": "|#9",
+            "color_item_braces": "|#9",
+            "show_empty_text": false,
+            "num_newlines_at_end": 1
+        },
+        "title": "|[2J|#4QWK Menu|[K|#0",
+        "acs": "user.sl >= 10",
+        "password": "",
+        "enter_actions": [],
+        "exit_actions": [],
+        "items": [
+            {
+                "item_key": "",
+                "item_text": "",
+                "visible": true,
+                "help_text": "",
+                "log_text": "",
+                "instance_message": "",
+                "acs": "",
+                "password": "",
+                "actions": []
+            },
+            {
+                "item_key": "D",
+                "item_text": "Download",
+                "visible": true,
+                "help_text": "Download QWK Packet",
+                "log_text": "",
+                "instance_message": "",
+                "acs": "",
+                "password": "",
+                "actions": [
+                    {
+                        "cmd": "qwk:download",
+                        "data": "",
+                        "acs": ""
+                    }
+                ]
+            },
+            {
+                "item_key": "U",
+                "item_text": "Upload Reply",
+                "visible": true,
+                "help_text": "",
+                "log_text": "",
+                "instance_message": "",
+                "acs": "",
+                "password": "",
+                "actions": [
+                    {
+                        "cmd": "qwk:upload",
+                        "data": "",
+                        "acs": ""
+                    }
+                ]
+            },
+            {
+                "item_key": "Q",
+                "item_text": "Quit",
+                "visible": true,
+                "help_text": "",
+                "log_text": "",
+                "instance_message": "",
+                "acs": "",
+                "password": "",
+                "actions": [
+                    {
+                        "cmd": "ReturnFromMenu",
+                        "data": "",
+                        "acs": ""
+                    }
+                ]
+            },
+            {
+                "item_key": "C",
+                "item_text": "Configure Settings",
+                "visible": true,
+                "help_text": "",
+                "log_text": "",
+                "instance_message": "",
+                "acs": "",
+                "password": "",
+                "actions": [
+                    {
+                        "cmd": "qwk:config_user",
+                        "data": "",
+                        "acs": ""
+                    }
+                ]
+            },
+            {
+                "item_key": "*",
+                "item_text": "Sysop Menu",
+                "visible": true,
+                "help_text": "",
+                "log_text": "",
+                "instance_message": "",
+                "acs": "",
+                "password": "",
+                "actions": [
+                    {
+                        "cmd": "qwk:config_sysop",
+                        "data": "",
+                        "acs": "user.sysop"
+                    }
+                ]
+            },
+            {
+                "item_key": "?",
+                "item_text": "Help",
+                "visible": true,
+                "help_text": "",
+                "log_text": "",
+                "instance_message": "",
+                "acs": "",
+                "password": "",
+                "actions": [
+                    {
+                        "cmd": "DisplayMenu",
+                        "data": "",
+                        "acs": ""
+                    }
+                ]
+            }
+        ]
+    }
+}
