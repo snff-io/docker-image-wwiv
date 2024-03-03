@@ -1,29 +1,43 @@
-FROM fedora AS BULID
+FROM debian AS BULID
 ARG git_branch=main
 ARG git_refspec=HEAD
 
 LABEL org.snffio.wwiv.git_branch=${git_branch}
 LABEL org.snffio.wwiv.git_refspec=${git_refspec}
 
- RUN dnf -y install dnf-plugins-core
- RUN dnf install -y git make ncurses-devel cmake gcc gcc-c++ vim unzip zip findutils iproute procps-ng hostname zlib-devel
-#DEBIAN:
-#RUN apt-get update && \
-    # apt-get install -y sudo git make libncurses5-dev cmake gcc g++ vim unzip zip findutils iproute2 procps zlib1g-dev && \
-    # apt-get upgrade && \
-    # rm -rf /var/lib/apt/lists/*
+# RUN dnf -y install dnf-plugins-core
+# RUN dnf install -y git make ncurses-devel cmake gcc gcc-c++ vim unzip zip findutils iproute procps-ng hostname zlib-devel
+# DEBIAN:
+RUN apt-get update
+RUN apt-get install -y \
+    build-essential sudo git make libncurses5-dev \
+    libcereal-dev libfmt-dev libgtest-dev libgmock-dev cmake libboost-all-dev \
+    gcc g++ vim unzip zip \
+    findutils iproute2 procps zlib1g-dev
+
+RUN apt-get upgrade && \
+    rm -rf /var/lib/apt/lists/*
 
 RUN mkdir /opt/wwiv
 
 RUN mkdir /docker
 COPY clone-wwiv.sh /docker/clone-wwiv.sh
+
+#RUN mkdir /src
 RUN sh /docker/clone-wwiv.sh /src ${git_branch} ${git_refspec}
+#COPY /src/. /docker/src
+
 
 COPY patch-wwiv.sh /docker/patch-wwiv.sh
 COPY patches /docker/patches
 # RUN sh /docker/patch-wwiv.sh /src/wwiv /docker/patches
 
+COPY build-deps.sh /docker/build-deps.sh
+RUN sh /docker/build-deps.sh /src/wwiv
+
+
 COPY build-wwiv.sh /docker/build-wwiv.sh
+
 RUN sh /docker/build-wwiv.sh /src/wwiv
 
 WORKDIR /opt/wwiv
@@ -31,20 +45,21 @@ COPY install-wwiv.sh /docker/install-wwiv.sh
 RUN sh /docker/install-wwiv.sh /src/wwiv/build /opt/wwiv
 
 LABEL SITUATION_LAYERIZATION="distro-switchstro"
-FROM fedora  
+FROM debian  
 
 COPY --from=BULID /opt/wwiv /opt/wwiv/
 RUN find /opt/wwiv -type f -exec chmod +x {} \;
 
-RUN dnf -y install dnf-plugins-core
-RUN dnf install -y git make ncurses-devel cmake gcc gcc-c++ vim unzip zip findutils iproute procps-ng hostname zlib-devel
+# RUN dnf -y install dnf-plugins-core
+# RUN dnf install -y git make ncurses-devel cmake gcc gcc-c++ vim unzip zip findutils iproute procps-ng hostname zlib-devel
 #ALPINE: 
 #RUN apk add --no-cache git make ncurses-dev cmake gcc g++ vim unzip zip findutils iproute2 procps zlib-dev
 #DEBIAN:
-# RUN apt-get update && \
-#     apt-get install -y sudo git make libncurses5-dev cmake gcc g++ vim unzip zip findutils iproute2 procps zlib1g-dev && \
-#     apt-get upgrade && \
-#     rm -rf /var/lib/apt/lists/*
+RUN apt-get update && \
+    apt-get install -y build-essential sudo git make libncurses5-dev \
+    libcereal-dev libfmt-dev libgtest-dev libgmock-dev cmake libboost-all-dev \
+    gcc g++ vim unzip zip \
+    findutils iproute2 procps zlib1g-dev
 #BUSYBOX
 # RUN wget -O /bin/git https://busybox.net/downloads/binaries/1.33.0-defconfig-multiarch/busybox-x86_64 && chmod +x /bin/git && \
 #     wget -O /bin/make https://busybox.net/downloads/binaries/1.33.0-defconfig-multiarch/busybox-x86_64 && chmod +x /bin/make && \

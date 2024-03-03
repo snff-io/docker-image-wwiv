@@ -7,16 +7,9 @@ wwiv_source_root=$(find "$(pwd)" -name "WWIV_SOURCE_ROOT" 2>/dev/null | head -n 
 wwiv_source_root="$(dirname "$(readlink -f "$wwiv_source_root")")"
 cd "$wwiv_source_root"
 
-# Clean previous build artifacts
-rm -rf build
-mkdir build
-cd build
-
-# Configure the project using CMake
-cmake -S ../ -B ./ -DCMAKE_INSTALL_PREFIX:PATH=/opt/wwiv -DCMAKE_BUILD_TYPE:STRING=Debug 
-
-#make with 8 jobs
+# Build dependencies if necessary (e.g., assuming cl345 needs to be built)
+cd deps/cl345
 make -j8
 
-# Return to the previous directory
+# Navigate to the source directory
 cd "$wwiv_source_root"

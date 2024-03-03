@@ -31,6 +31,7 @@ chown -R wwiv:wwiv .
 
 # Check if running in interactive mode
 if [ -t 0 ]; then
+    set +xe
     echo "WWIV_MODE = $WWIV_MODE"
     if [ "$WWIV_MODE" == "wfc" ]; then
         /srv/wwiv/bbs

@@ -12,10 +12,6 @@ git clone -b $branch https://github.com/snff-io/wwiv/ wwiv
 
 cd wwiv
 
-git submodule update --init --recursive
+git submodule init
 
-git submodule update --recursive --remote
-
-git checkout $refspec
-
-
+git submodule update --recursive
