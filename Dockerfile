@@ -58,7 +58,7 @@ RUN find /opt/wwiv -type f -exec chmod +x {} \;
 RUN apt-get update && \
     apt-get install -y build-essential sudo git make libncurses5-dev \
     libcereal-dev libfmt-dev libgtest-dev libgmock-dev cmake libboost-all-dev \
-    gcc g++ vim unzip zip \
+    gcc g++ vim unzip zip nodejs \
     findutils iproute2 procps zlib1g-dev
 #BUSYBOX
 # RUN wget -O /bin/git https://busybox.net/downloads/binaries/1.33.0-defconfig-multiarch/busybox-x86_64 && chmod +x /bin/git && \
