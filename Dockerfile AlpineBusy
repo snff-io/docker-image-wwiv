@@ -1,0 +1,97 @@
+FROM alpine AS BULID
+ARG git_branch=main
+ARG git_refspec=HEAD
+
+LABEL org.snffio.wwiv.git_branch=${git_branch}
+LABEL org.snffio.wwiv.git_refspec=${git_refspec}
+
+# Version control tools
+# Development tools
+# System utilities
+# Libraries and dependencies
+RUN apk update && apk add --no-cache git unzip vim zip
+RUN apk add --no-cache make cmake gcc g++ cereal
+RUN apk add --no-cache findutils iproute2 procps wget tar
+RUN apk add --no-cache ncurses-dev zlib-dev boost-dev gtest-dev fmt-dev doxygen
+
+RUN mkdir /opt/wwiv
+
+RUN mkdir /docker
+COPY clone-wwiv.sh /docker/clone-wwiv.sh
+RUN sh /docker/clone-wwiv.sh /src ${git_branch} ${git_refspec}
+
+COPY patch-wwiv.sh /docker/patch-wwiv.sh
+COPY patches /docker/patches
+# RUN sh /docker/patch-wwiv.sh /src/wwiv /docker/patches
+
+COPY build-deps.sh /docker/build-deps.sh
+RUN sh /docker/build-deps.sh /src/wwiv 
+
+COPY build-wwiv.sh /docker/build-wwiv.sh
+RUN sh /docker/build-wwiv.sh /src/wwiv
+
+WORKDIR /opt/wwiv
+
+COPY install-wwiv.sh /docker/install-wwiv.sh
+RUN sh /docker/install-wwiv.sh /src/wwiv/build /opt/wwiv
+
+##BOOOST
+# Download and extract Boost source
+# Compile Boost
+# Copy compiled Boost libraries to a temporary directory
+# Cleanup
+RUN wget https://boostorg.jfrog.io/artifactory/main/release/1.77.0/source/boost_1_77_0.tar.gz && \
+    tar xf boost_1_77_0.tar.gz && \
+    cd boost_1_77_0
+
+RUN ./bootstrap.sh && \
+    ./b2
+
+RUN mkdir -p /tmp/boost-libraries && \
+    cp -r boost_1_77_0/stage/lib/* /tmp/boost-libraries
+
+RUN rm -rf boost_1_77_0 && \
+    rm boost_1_77_0.tar.gz
+
+#DEPLOY
+LABEL SITUATION_LAYERIZATION="FINAL"
+FROM busybox
+
+# Copy compiled BOOST libraries from BUILD
+# Cleanup temporary directory
+COPY --from=BULID /tmp/boost-libraries /usr/lib
+RUN rm -rf /tmp/boost-libraries
+
+# Copy WWIV From BUILD
+COPY --from=BULID /opt/wwiv /opt/wwiv/
+RUN find /opt/wwiv -type f -exec chmod +x {} \;
+
+RUN wget -O /bin/git https://busybox.net/downloads/binaries/1.33.0-defconfig-multiarch/busybox-x86_64 && chmod +x /bin/git && \
+    wget -O /bin/make https://busybox.net/downloads/binaries/1.33.0-defconfig-multiarch/busybox-x86_64 && chmod +x /bin/make && \
+    wget -O /bin/cmake https://busybox.net/downloads/binaries/1.33.0-defconfig-multiarch/busybox-x86_64 && chmod +x /bin/cmake && \
+    wget -O /bin/gcc https://busybox.net/downloads/binaries/1.33.0-defconfig-multiarch/busybox-x86_64 && chmod +x /bin/gcc && \
+    wget -O /bin/g++ https://busybox.net/downloads/binaries/1.33.0-defconfig-multiarch/busybox-x86_64 && chmod +x /bin/g++ && \
+    wget -O /bin/vim https://busybox.net/downloads/binaries/1.33.0-defconfig-multiarch/busybox-x86_64 && chmod +x /bin/vim && \
+    wget -O /bin/unzip https://busybox.net/downloads/binaries/1.33.0-defconfig-multiarch/busybox-x86_64 && chmod +x /bin/unzip && \
+    wget -O /bin/zip https://busybox.net/downloads/binaries/1.33.0-defconfig-multiarch/busybox-x86_64 && chmod +x /bin/zip && \
+    wget -O /bin/find https://busybox.net/downloads/binaries/1.33.0-defconfig-multiarch/busybox-x86_64 && chmod +x /bin/find && \
+    wget -O /bin/ip https://busybox.net/downloads/binaries/1.33.0-defconfig-multiarch/busybox-x86_64 && chmod +x /bin/ip && \
+    wget -O /bin/ps https://busybox.net/downloads/binaries/1.33.0-defconfig-multiarch/busybox-x86_64 && chmod +x /bin/ps && \
+    wget -O /bin/hostname https://busybox.net/downloads/binaries/1.33.0-defconfig-multiarch/busybox-x86_64 && chmod +x /bin/hostname && \
+    wget -O /bin/zlib https://busybox.net/downloads/binaries/1.33.0-defconfig-multiarch/busybox-x86_64 && chmod +x /bin/zlib
+
+# Install Node.js
+RUN wget -O /tmp/node.tar.xz https://nodejs.org/dist/v14.18.1/node-v14.18.1-linux-x64.tar.xz && \
+    tar -xJf /tmp/node.tar.xz -C /usr/local --strip-components=1 && \
+    rm /tmp/node.tar.xz
+
+EXPOSE 7777
+
+COPY entrypoint.sh /docker/entrypoint.sh
+ENTRYPOINT ["sh", "/docker/entrypoint.sh"]
+
+WORKDIR /srv/wwiv
+VOLUME /srv/wwiv
+
+RUN adduser -D -h /srv/wwiv wwiv
+CMD ["/opt/wwiv/wwivd", "--wwiv_user=wwiv"]
