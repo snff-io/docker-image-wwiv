@@ -1,5 +1,5 @@
 FROM alpine AS BULID
-ARG git_branch=main
+ARG git_branch=dockering
 ARG git_refspec=HEAD
 
 LABEL org.snffio.wwiv.git_branch=${git_branch}
@@ -10,7 +10,7 @@ LABEL org.snffio.wwiv.git_refspec=${git_refspec}
 # System utilities
 # Libraries and dependencies
 RUN apk update && apk add --no-cache git unzip vim zip
-RUN apk add --no-cache make cmake gcc g++ cereal
+RUN apk add --no-cache make cmake gcc g++ 
 RUN apk add --no-cache findutils iproute2 procps wget tar
 RUN apk add --no-cache ncurses-dev zlib-dev boost-dev gtest-dev fmt-dev doxygen
 

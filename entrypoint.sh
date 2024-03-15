@@ -6,6 +6,7 @@ export PATH
 set -xe
 
 if [ ! -d data ]; then
+    
 	cp -a /opt/wwiv/* .
 	#cp -a /opt/wwiv/admin/* .
 	#cp inifiles/* .
@@ -36,7 +37,7 @@ if [ -t 0 ]; then
     if [ "$WWIV_MODE" == "wfc" ]; then
         /srv/wwiv/bbs
     elif [ "$WWIV_MODE" == "config" ]; then
-        /srv/wwiv/wwivconfig
+        /srv/wwiv/wwivconfig --initialize
     else
         if [ ! -f data/wwivd.json ]; then
             echo "**********************************************************************"

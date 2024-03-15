@@ -1,0 +1,60 @@
+FROM alpine AS BULID
+ARG git_branch=dockering
+ARG git_refspec=HEAD
+
+LABEL org.snffio.wwiv.git_branch=${git_branch}
+LABEL org.snffio.wwiv.git_refspec=${git_refspec}
+
+# Version control tools
+# Development tools
+# System utilities
+# Libraries and dependencies
+RUN apk update && apk add --no-cache git unzip vim zip
+RUN apk add --no-cache make cmake gcc g++ cereal
+RUN apk add --no-cache findutils iproute2 procps wget tar
+RUN apk add --no-cache ncurses-dev zlib-dev boost-dev gtest-dev fmt-dev doxygen
+
+RUN mkdir /opt/wwiv
+
+RUN mkdir /docker
+COPY clone-wwiv.sh /docker/clone-wwiv.sh
+RUN sh /docker/clone-wwiv.sh /src ${git_branch} ${git_refspec}
+
+COPY patch-wwiv.sh /docker/patch-wwiv.sh
+COPY patches /docker/patches
+# RUN sh /docker/patch-wwiv.sh /src/wwiv /docker/patches
+
+COPY build-deps.sh /docker/build-deps.sh
+RUN sh /docker/build-deps.sh /src/wwiv 
+
+COPY build-wwiv.sh /docker/build-wwiv.sh
+RUN sh /docker/build-wwiv.sh /src/wwiv
+
+WORKDIR /opt/wwiv
+
+COPY install-wwiv.sh /docker/install-wwiv.sh
+RUN sh /docker/install-wwiv.sh /src/wwiv/build /opt/wwiv
+
+#DEPLOY
+LABEL SITUATION_LAYERIZATION="FINAL"
+FROM alpine
+
+# Copy WWIV From BUILD
+COPY --from=BULID /opt/wwiv /opt/wwiv/
+RUN find /opt/wwiv -type f -exec chmod +x {} \;
+
+RUN apk update && apk add --no-cache git unzip vim zip
+RUN apk add --no-cache make cmake gcc g++ cereal
+RUN apk add --no-cache findutils iproute2 procps wget tar
+RUN apk add --no-cache ncurses-dev zlib-dev boost-dev gtest-dev fmt-dev doxygen
+
+EXPOSE 7777
+
+COPY entrypoint.sh /docker/entrypoint.sh
+ENTRYPOINT ["sh", "/docker/entrypoint.sh"]
+
+WORKDIR /srv/wwiv
+VOLUME /srv/wwiv
+
+RUN adduser -D -h /srv/wwiv wwiv
+CMD ["/opt/wwiv/wwivd", "--wwiv_user=wwiv"]

@@ -1,0 +1,107 @@
+FROM fedora AS BULID
+ARG git_branch=main
+ARG git_refspec=HEAD
+
+LABEL org.snffio.wwiv.git_branch=${git_branch}
+LABEL org.snffio.wwiv.git_refspec=${git_refspec}
+
+RUN dnf -y install dnf-plugins-core
+RUN dnf install -y git make ncurses-devel cmake gcc gcc-c++ \
+    vim unzip zip findutils iproute procps-ng hostname \
+    zlib-devel boost boost-devel cereal-devel \
+    fmt-devel gtest-devel gmock-devel wget
+
+RUN mkdir /opt/wwiv
+
+RUN mkdir /docker
+COPY clone-wwiv.sh /docker/clone-wwiv.sh
+RUN sh /docker/clone-wwiv.sh /src ${git_branch} ${git_refspec} force
+
+COPY patch-wwiv.sh /docker/patch-wwiv.sh
+COPY patches /docker/patches
+# RUN sh /docker/patch-wwiv.sh /src/wwiv /docker/patches
+
+COPY build-deps.sh /docker/build-deps.sh
+RUN sh /docker/build-deps.sh /src/wwiv 
+
+COPY build-wwiv.sh /docker/build-wwiv.sh
+RUN sh /docker/build-wwiv.sh /src/wwiv
+
+WORKDIR /opt/wwiv
+COPY install-wwiv.sh /docker/install-wwiv.sh
+RUN sh /docker/install-wwiv.sh /src/wwiv/build /opt/wwiv
+
+RUN mkdir /tmp/ncurses -p
+# Download ncurses source code
+RUN wget -q https://invisible-mirror.net/archives/ncurses/ncurses-6.2.tar.gz && \
+    tar xf ncurses-6.2.tar.gz && \
+    rm ncurses-6.2.tar.gz && \
+    cd ncurses-6.2 && \
+    ./configure --with-shared && \
+    make -j8 && \
+    make install DESTDIR=/tmp/ncurses && \
+    cd ..
+
+
+RUN wget https://boostorg.jfrog.io/artifactory/main/release/1.77.0/source/boost_1_77_0.tar.gz && \
+    tar xf boost_1_77_0.tar.gz && \
+    cd boost_1_77_0 && \
+    ./bootstrap.sh && \
+    ./b2 && \
+    mkdir -p /tmp/boost-libraries && \
+    cp -r stage/lib/* /tmp/boost-libraries && \
+    cd .. && \
+    rm -rf boost_1_77_0 && \
+    rm boost_1_77_0.tar.gz
+
+#DEPLOY
+LABEL SITUATION_LAYERIZATION="FINAL"
+FROM busybox
+
+# Copy compiled BOOST libraries from BUILD
+# Cleanup temporary directory
+COPY --from=BULID /tmp/boost-libraries /usr/lib
+COPY --from=BULID /tmp/ncurses /usr/local/lib
+
+RUN rm -rf /tmp/boost-libraries
+RUN rm -rf /tmp/ncurses
+
+# Copy WWIV From BUILD
+COPY --from=BULID /opt/wwiv /opt/wwiv/
+
+RUN find /opt/wwiv -type f -exec chmod +x {} \;
+
+
+RUN wget -O /bin/vim https://busybox.net/downloads/binaries/1.31.0-defconfig-multiarch-musl/busybox-x86_64 && chmod +x /bin/vim
+RUN cp /bin/vim /bin/unzip  && chmod +x /bin/unzip 
+RUN cp /bin/vim /bin/zip && chmod +x /bin/zip 
+RUN cp /bin/vim /bin/find && chmod +x /bin/find 
+RUN cp /bin/vim /bin/ip && chmod +x /bin/ip 
+RUN cp /bin/vim /bin/ps && chmod +x /bin/ps
+RUN cp /bin/vim /bin/hostna_64 && chmod +x /bin/hostname
+RUN cp /bin/vim /bin/zlib && chmod +x /bin/zlib
+
+
+# RUN wget -O /bin/unzip https://busybox.net/downloads/binaries/1.31.0-defconfig-multiarch-musl/busybox-x86_64 && chmod +x /bin/unzip 
+# RUN wget -O /bin/zip https://busybox.net/downloads/binaries/1.31.0-defconfig-multiarch-musl/busybox-x86_64 && chmod +x /bin/zip 
+# RUN wget -O /bin/find https://busybox.net/downloads/binaries/1.31.0-defconfig-multiarch-musl/busybox-x86_64 && chmod +x /bin/find 
+# RUN wget -O /bin/ip https://busybox.net/downloads/binaries/1.31.0-defconfig-multiarch-musl/busybox-x86_64 && chmod +x /bin/ip 
+# RUN wget -O /bin/ps https://busybox.net/downloads/binaries/1.31.0-defconfig-multiarch-musl/busybox-x86_64 && chmod +x /bin/ps
+# RUN wget -O /bin/hostname https://busybox.net/downloads/binaries/1.31.0-defconfig-multiarch-musl/busybox-x86_64 && chmod +x /bin/hostname
+# RUN wget -O /bin/zlib https://busybox.net/downloads/binaries/1.31.0-defconfig-multiarch-musl/busybox-x86_64 && chmod +x /bin/zlib
+
+# Install Node.js
+# RUN wget -O /tmp/node.tar.xz https://nodejs.org/dist/v14.18.1/node-v14.18.1-linux-x64.tar.xz
+# RUN tar -xf /tmp/node.tar.xz -C /usr/local --strip-components=1
+# RUN rm /tmp/node.tar.xz
+
+EXPOSE 7777
+
+COPY entrypoint.sh /docker/entrypoint.sh
+ENTRYPOINT ["sh", "/docker/entrypoint.sh"]
+
+WORKDIR /srv/wwiv
+VOLUME /srv/wwiv
+
+RUN adduser -D -h /srv/wwiv wwiv
+CMD ["/opt/wwiv/wwivd", "--wwiv_user=wwiv"]
